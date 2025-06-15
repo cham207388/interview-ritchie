@@ -20,7 +20,7 @@ java -jar build/libs/interview-ritchie-0.0.1-SNAPSHOT.jar
 ```
 
 access the swagger ui
-[swagger](http://localhost:8080/)
+[swagger](http://localhost:8080/swagger-ui/index.html)
 
 sample request to add equipment
 
