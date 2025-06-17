@@ -3,6 +3,7 @@ package com.alhagie.interview.ritchie.controller;
 import com.alhagie.interview.ritchie.dto.EquipmentRequest;
 import com.alhagie.interview.ritchie.entity.Equipment;
 import com.alhagie.interview.ritchie.service.EquipmentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +18,7 @@ public class EquipmentController {
     private final EquipmentService equipmentService;
 
     @PostMapping
-    public ResponseEntity<Void> saveEquipment(@RequestBody EquipmentRequest equipmentRequest) {
+    public ResponseEntity<Void> saveEquipment(@RequestBody @Valid EquipmentRequest equipmentRequest) {
         String type = equipmentRequest.getType();
         if (type == null || type.isEmpty()) {
             return ResponseEntity.badRequest().build();
