@@ -20,12 +20,12 @@ RUN ./gradlew build --no-daemon -x test
 # Second stage: runtime image
 FROM eclipse-temurin:21-jre-alpine
 
-RUN addgroup -S -g 1000 producer && \
-    adduser -S -u 1000 -G producer producer && \
+RUN addgroup -S -g 1000 appuser && \
+    adduser -S -u 1000 -G appuser appuser && \
     mkdir -p /app && \
-    chown producer:producer /app
+    chown appuser:appuser /app
 
-USER producer
+USER appuser
 
 # Set working directory
 WORKDIR /app
