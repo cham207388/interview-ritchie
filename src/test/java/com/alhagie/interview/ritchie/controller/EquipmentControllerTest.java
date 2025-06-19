@@ -73,6 +73,32 @@ class EquipmentControllerTest {
     }
 
     @Test
+    void save_equipment_should_return_bad_request_when_type_is_blank() throws Exception {
+        // Given
+        EquipmentRequest request = new EquipmentRequest("", 1, 2, 2023);
+        String requestJson = objectMapper.writeValueAsString(request);
+
+        // When & Then
+        mockMvc.perform(post(BASE_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void save_equipment_should_return_bad_request_when_type_is_null() throws Exception {
+        // Given
+        EquipmentRequest request = new EquipmentRequest(null, 1, 1, 2023);
+        String requestJson = objectMapper.writeValueAsString(request);
+
+        // When & Then
+        mockMvc.perform(post(BASE_URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void get_all_equipment_should_return_equipment_list() throws Exception {
         // Given
         List<Equipment> equipments = Arrays.asList(
@@ -132,32 +158,6 @@ class EquipmentControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(equipmentService).deleteEquipment(id);
-    }
-
-    @Test
-    void save_equipment_should_return_bad_request_when_type_is_blank() throws Exception {
-        // Given
-        EquipmentRequest request = new EquipmentRequest("", 1, 2, 2023);
-        String requestJson = objectMapper.writeValueAsString(request);
-
-        // When & Then
-        mockMvc.perform(post(BASE_URL)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestJson))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void save_equipment_should_return_bad_request_when_type_is_null() throws Exception {
-        // Given
-        EquipmentRequest request = new EquipmentRequest(null, 1, 1, 2023);
-        String requestJson = objectMapper.writeValueAsString(request);
-
-        // When & Then
-        mockMvc.perform(post(BASE_URL)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestJson))
-                .andExpect(status().isBadRequest());
     }
 
     @Test
