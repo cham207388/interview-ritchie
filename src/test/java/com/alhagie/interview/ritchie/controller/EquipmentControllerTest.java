@@ -12,11 +12,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -36,11 +38,11 @@ class EquipmentControllerTest {
     @Test
     void save_equipment_should_return_no_content() throws Exception {
         // Given
-        EquipmentRequest request = new EquipmentRequest("Excavator");
+        EquipmentRequest request = new EquipmentRequest("Excavator", 1, 1, 2023);
         String requestJson = objectMapper.writeValueAsString(request);
 
         // When & Then
-        mockMvc.perform(post("/api/v1/equipment")
+        mockMvc.perform(post("/api/v1/equipments")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isNoContent());
@@ -58,7 +60,7 @@ class EquipmentControllerTest {
         when(equipmentService.getAllEquipment()).thenReturn(equipments);
 
         // When & Then
-        mockMvc.perform(get("/api/v1/equipment"))
+        mockMvc.perform(get("/api/v1/equipments"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].id", is(1)))
@@ -77,7 +79,7 @@ class EquipmentControllerTest {
         when(equipmentService.getEquipmentById(id)).thenReturn(Optional.of(equipment));
 
         // When & Then
-        mockMvc.perform(get("/api/v1/equipment/{id}", id))
+        mockMvc.perform(get("/api/v1/equipments/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(id)))
                 .andExpect(jsonPath("$.type", is("Truck")));
@@ -92,7 +94,7 @@ class EquipmentControllerTest {
         when(equipmentService.getEquipmentById(id)).thenReturn(Optional.empty());
 
         // When & Then
-        mockMvc.perform(get("/api/v1/equipment/{id}", id))
+        mockMvc.perform(get("/api/v1/equipments/{id}", id))
                 .andExpect(status().isNotFound());
 
         verify(equipmentService).getEquipmentById(id);
@@ -104,7 +106,7 @@ class EquipmentControllerTest {
         int id = 1;
 
         // When & Then
-        mockMvc.perform(delete("/api/v1/equipment/{id}", id))
+        mockMvc.perform(delete("/api/v1/equipments/{id}", id))
                 .andExpect(status().isNoContent());
 
         verify(equipmentService).deleteEquipment(id);
@@ -113,11 +115,11 @@ class EquipmentControllerTest {
     @Test
     void save_equipment_should_return_bad_request_when_type_is_blank() throws Exception {
         // Given
-        EquipmentRequest request = new EquipmentRequest("");
+        EquipmentRequest request = new EquipmentRequest("", 1, 2, 2023);
         String requestJson = objectMapper.writeValueAsString(request);
 
         // When & Then
-        mockMvc.perform(post("/api/v1/equipment")
+        mockMvc.perform(post("/api/v1/equipments")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isBadRequest());
@@ -126,13 +128,42 @@ class EquipmentControllerTest {
     @Test
     void save_equipment_should_return_bad_request_when_type_is_null() throws Exception {
         // Given
-        EquipmentRequest request = new EquipmentRequest(null);
+        EquipmentRequest request = new EquipmentRequest(null, 1, 1, 2023);
         String requestJson = objectMapper.writeValueAsString(request);
 
         // When & Then
-        mockMvc.perform(post("/api/v1/equipment")
+        mockMvc.perform(post("/api/v1/equipments")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void get_equipment_by_id_should_include_creation_time() throws Exception {
+        // Given
+        int id = 1;
+        when(equipmentService.getEquipmentById(id)).thenReturn(Optional.of(mockEquipment()));
+
+        // When & Then
+        mockMvc.perform(get("/api/v1/equipments/{id}", id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.creation_time").exists())
+                .andExpect(jsonPath("$.creation_time").isNotEmpty());
+    }
+
+    @Test
+    void save_equipment_should_return_throw_exception_missing_fields() throws Exception {
+        // Given
+        EquipmentRequest request = new EquipmentRequest("Tractor", 1, 1, null);
+        String requestJson = objectMapper.writeValueAsString(request);
+        assertThrows(Exception.class, () -> mockMvc.perform(post("/api/v1/equipments")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestJson)));
+    }
+
+    private Equipment mockEquipment() {
+        Equipment equipment = new Equipment(1, "Tractor");
+        equipment.setCreation_time(LocalDateTime.of(2025, 1, 1, 1, 0, 0));
+        return equipment;
     }
 }

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
 import java.util.List;
 
 @RestController
@@ -18,12 +19,15 @@ public class EquipmentController {
     private final EquipmentService equipmentService;
 
     @PostMapping
-    public ResponseEntity<Void> saveEquipment(@RequestBody @Valid EquipmentRequest equipmentRequest) {
-        String type = equipmentRequest.getType();
+    public ResponseEntity<Void> saveEquipment(@RequestBody @Valid EquipmentRequest req) {
+        String type = req.getType();
         if (type == null || type.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
-        equipmentService.saveEquipment(equipmentRequest);
+        if (req.getModelYear() == null || (req.getHour() == null && req.getMileage() == null)) {
+            throw new RuntimeException("Invalid equipment request: Model year, hour, or mileage is missing.");
+        }
+        equipmentService.saveEquipment(req);
         return ResponseEntity.noContent().build();
     }
 

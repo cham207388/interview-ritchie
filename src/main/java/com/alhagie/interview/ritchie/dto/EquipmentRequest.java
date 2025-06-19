@@ -9,4 +9,7 @@ import lombok.Getter;
 public class EquipmentRequest {
     @NotEmpty
     private String type;
+    private Integer hour;
+    private Integer mileage;
+    private Integer modelYear;
 }

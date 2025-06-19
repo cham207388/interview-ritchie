@@ -36,7 +36,7 @@ class EquipmentServiceTest {
     @Test
     void saveEquipment_shouldAddNewEquipmentWithIncrementedId() {
         // Given
-        EquipmentRequest request = new EquipmentRequest("Excavator");
+        EquipmentRequest request = new EquipmentRequest("Excavator", 2023, 100, 500);
         int initialSize = equipmentService.getAllEquipment().size();
 
         // When
