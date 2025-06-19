@@ -51,6 +51,26 @@ class EquipmentControllerTest {
     }
 
     @Test
+    void save_equipment_should_return_throw_exception_missing_model_year() throws Exception {
+        // Given
+        EquipmentRequest request = new EquipmentRequest("Tractor", 1, 1, null);
+        String requestJson = objectMapper.writeValueAsString(request);
+        assertThrows(Exception.class, () -> mockMvc.perform(post("/api/v1/equipments")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestJson)));
+    }
+
+    @Test
+    void save_equipment_should_return_throw_exception_missing_hour_and_mileage() throws Exception {
+        // Given
+        EquipmentRequest request = new EquipmentRequest("Tractor", null, null, 2012);
+        String requestJson = objectMapper.writeValueAsString(request);
+        assertThrows(Exception.class, () -> mockMvc.perform(post("/api/v1/equipments")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestJson)));
+    }
+
+    @Test
     void get_all_equipment_should_return_equipment_list() throws Exception {
         // Given
         List<Equipment> equipments = Arrays.asList(
@@ -149,16 +169,6 @@ class EquipmentControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.creation_time").exists())
                 .andExpect(jsonPath("$.creation_time").isNotEmpty());
-    }
-
-    @Test
-    void save_equipment_should_return_throw_exception_missing_fields() throws Exception {
-        // Given
-        EquipmentRequest request = new EquipmentRequest("Tractor", 1, 1, null);
-        String requestJson = objectMapper.writeValueAsString(request);
-        assertThrows(Exception.class, () -> mockMvc.perform(post("/api/v1/equipments")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestJson)));
     }
 
     private Equipment mockEquipment() {
