@@ -35,6 +35,8 @@ class EquipmentControllerTest {
     @MockitoBean
     private EquipmentService equipmentService;
 
+    private final static String BASE_URL = "/api/v1/equipments";
+
     @Test
     void save_equipment_should_return_no_content() throws Exception {
         // Given
@@ -42,7 +44,7 @@ class EquipmentControllerTest {
         String requestJson = objectMapper.writeValueAsString(request);
 
         // When & Then
-        mockMvc.perform(post("/api/v1/equipments")
+        mockMvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isNoContent());
@@ -55,7 +57,7 @@ class EquipmentControllerTest {
         // Given
         EquipmentRequest request = new EquipmentRequest("Tractor", 1, 1, null);
         String requestJson = objectMapper.writeValueAsString(request);
-        assertThrows(Exception.class, () -> mockMvc.perform(post("/api/v1/equipments")
+        assertThrows(Exception.class, () -> mockMvc.perform(post(BASE_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestJson)));
     }
@@ -65,7 +67,7 @@ class EquipmentControllerTest {
         // Given
         EquipmentRequest request = new EquipmentRequest("Tractor", null, null, 2012);
         String requestJson = objectMapper.writeValueAsString(request);
-        assertThrows(Exception.class, () -> mockMvc.perform(post("/api/v1/equipments")
+        assertThrows(Exception.class, () -> mockMvc.perform(post(BASE_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestJson)));
     }
@@ -80,7 +82,7 @@ class EquipmentControllerTest {
         when(equipmentService.getAllEquipment()).thenReturn(equipments);
 
         // When & Then
-        mockMvc.perform(get("/api/v1/equipments"))
+        mockMvc.perform(get(BASE_URL))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].id", is(1)))
@@ -99,7 +101,7 @@ class EquipmentControllerTest {
         when(equipmentService.getEquipmentById(id)).thenReturn(Optional.of(equipment));
 
         // When & Then
-        mockMvc.perform(get("/api/v1/equipments/{id}", id))
+        mockMvc.perform(get(BASE_URL + "/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(id)))
                 .andExpect(jsonPath("$.type", is("Truck")));
@@ -114,7 +116,7 @@ class EquipmentControllerTest {
         when(equipmentService.getEquipmentById(id)).thenReturn(Optional.empty());
 
         // When & Then
-        mockMvc.perform(get("/api/v1/equipments/{id}", id))
+        mockMvc.perform(get(BASE_URL + "/{id}", id))
                 .andExpect(status().isNotFound());
 
         verify(equipmentService).getEquipmentById(id);
@@ -126,7 +128,7 @@ class EquipmentControllerTest {
         int id = 1;
 
         // When & Then
-        mockMvc.perform(delete("/api/v1/equipments/{id}", id))
+        mockMvc.perform(delete(BASE_URL + "/{id}", id))
                 .andExpect(status().isNoContent());
 
         verify(equipmentService).deleteEquipment(id);
@@ -139,7 +141,7 @@ class EquipmentControllerTest {
         String requestJson = objectMapper.writeValueAsString(request);
 
         // When & Then
-        mockMvc.perform(post("/api/v1/equipments")
+        mockMvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isBadRequest());
@@ -152,7 +154,7 @@ class EquipmentControllerTest {
         String requestJson = objectMapper.writeValueAsString(request);
 
         // When & Then
-        mockMvc.perform(post("/api/v1/equipments")
+        mockMvc.perform(post(BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestJson))
                 .andExpect(status().isBadRequest());
@@ -165,7 +167,7 @@ class EquipmentControllerTest {
         when(equipmentService.getEquipmentById(id)).thenReturn(Optional.of(mockEquipment()));
 
         // When & Then
-        mockMvc.perform(get("/api/v1/equipments/{id}", id))
+        mockMvc.perform(get(BASE_URL + "/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.creation_time").exists())
                 .andExpect(jsonPath("$.creation_time").isNotEmpty());
